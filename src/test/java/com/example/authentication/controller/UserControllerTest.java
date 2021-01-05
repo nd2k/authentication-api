@@ -3,7 +3,7 @@ package com.example.authentication.controller;
 import com.example.authentication.model.User;
 import com.example.authentication.model.UserDetailsResponse;
 import com.example.authentication.service.MapperServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.authentication.service.ValidationServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,13 +31,15 @@ class UserControllerTest {
     private UserController userControllerTest;
     @Mock
     private MapperServiceImpl mapperServiceImplTest;
+    @Mock
+    private ValidationServiceImpl validationServiceImplTest;
     String userDtoTest = "{ \"firstName\": \"John\", \"lastName\": \"Doe\", \"email\": \"johndoe@gmail.com\", \"password\": \"test\" }";
     User expectedUser;
 
     @BeforeEach
     void setUp() {
-        this.mockMvc = MockMvcBuilders.standaloneSetup(new UserController(mapperServiceImplTest)).build();
-        userControllerTest = new UserController(mapperServiceImplTest);
+        this.mockMvc = MockMvcBuilders.standaloneSetup(new UserController(mapperServiceImplTest, validationServiceImplTest)).build();
+        userControllerTest = new UserController(mapperServiceImplTest, validationServiceImplTest);
     }
 
     @Test
@@ -54,7 +56,7 @@ class UserControllerTest {
         // Arrange
         expectedUser = new User("John", "Doe", "johndoe@gmail.com", "test");
         when(mapperServiceImplTest.stringToUser(userDtoTest)).thenReturn(expectedUser);
-        UserDetailsResponse expectedUserDetailsResponse = new UserDetailsResponse(expectedUser, "User successfully registered", HttpStatus.CREATED);
+        UserDetailsResponse expectedUserDetailsResponse = new UserDetailsResponse(expectedUser, "User successfully sign up", HttpStatus.CREATED);
         ResponseEntity<UserDetailsResponse> expectedResponseEntity = new ResponseEntity<>(expectedUserDetailsResponse, HttpStatus.CREATED);
         // Act
         ResponseEntity<UserDetailsResponse> response = userControllerTest.register(userDtoTest);
